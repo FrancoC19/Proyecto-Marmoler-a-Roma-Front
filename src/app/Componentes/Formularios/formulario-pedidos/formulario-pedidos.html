@@ -1,0 +1,132 @@
+<div class="contenedor-form">
+  <div class="card-form">
+
+    <h2 class="titulo-form">Pedidos</h2>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="formulario">
+
+      <!-- ==================== CLIENTE ==================== -->
+      <div style="margin-top:20px;">
+        <label>Cliente (buscar por DNI o nombre)</label>
+        <input type="text"
+              [value]="clienteBusqueda"
+              (input)="onClienteSearch($event.target.value)"
+              placeholder="Escribí DNI o nombre..." />
+      </div>
+
+      <!-- Lista de sugerencias -->
+      @if (clientesFiltrados.length > 0) {
+        <ul class="sugerencias">
+          @for (c of clientesFiltrados; track $index) {
+            <li (click)="seleccionarCliente(c)">
+              {{ c.nombre }} {{ c.apellido }} — DNI {{ c.dni }}
+            </li>
+          }
+        </ul>
+      }
+
+      <!-- Cliente seleccionado -->
+      @if (clienteSeleccionado) {
+        <div class="seleccionado">
+          <strong>Cliente seleccionado:</strong>
+          {{ clienteSeleccionado.nombre }} {{ clienteSeleccionado.apellido }}
+        </div>
+      }
+
+      <!-- Campo oculto del form -->
+      <input type="hidden" formControlName="cliente" />
+
+      <!-- ==================== EMPLEADO ==================== -->
+      <label>Empleado</label>
+      <select formControlName="empleado">
+        <option [value]="">Seleccione un empleado</option>
+        @for (e of empleados; track $index) {
+          <option [value]="e.dni">
+            {{ e.nombre }} — {{ e.rolesEmpleado }} (DNI: {{ e.dni }})
+          </option>
+        }
+      </select>
+
+      <!-- ==================== MATERIAL ==================== -->
+      <label>Material</label>
+      <select formControlName="material">
+        <option [ngValue]="null">Seleccione un material</option>
+        @for (mat of materiales; track $index) {
+          <option [ngValue]="mat">
+            {{ mat.nombreMaterial }} — ${{ mat.valorMetroCuadrado }}
+          </option>
+        }
+      </select>
+
+      <!-- ==================== PILETA ==================== -->
+      <label>Piletas:</label>
+<select formControlName="pileta">
+  <option [ngValue]="null">Seleccione una pileta</option>
+  @for (p of piletas; track $index) {
+    <option [ngValue]="p">
+      {{ p.marca }} — {{ p.modelo }} (Stock: {{ p.cantidad }})
+    </option>
+  }
+</select>
+
+      <!-- ==================== GRIFERÍA ==================== -->
+      <label>Grifería</label>
+      <input type="text" formControlName="griferia" />
+
+      <!-- ==================== MOLDURA ==================== -->
+      <label>Moldura</label>
+      <input type="text" formControlName="moldura" />
+
+      <!-- ==================== SEÑA ==================== -->
+      <label>Seña</label>
+      <input type="number" formControlName="senia" />
+
+      <!-- ==================== FECHAS ==================== -->
+      <label>Fecha de entrega</label>
+      <input type="date" formControlName="fechaEntrega" />
+
+      <label>Fecha de emisión</label>
+      <input type="date" formControlName="fechaEmision" />
+
+      <!-- ==================== M2 ==================== -->
+      <label>Metros cuadrados</label>
+      <input type="number" formControlName="metrosCuadrados" />
+
+      <!-- ==================== DIRECCIÓN ==================== -->
+      <div [formGroup]="direccion">
+        <h4>Dirección</h4>
+        <label>Calle</label>
+        <input formControlName="calle" type="text" />
+        <label>Número</label>
+        <input formControlName="numero" type="text" />
+        <label>Localidad</label>
+        <input formControlName="localidad" type="text" />
+      </div>
+
+      <!-- ==================== ESTADO ==================== -->
+      <label>Estado</label>
+      <select formControlName="estado">
+        <option value="EN_PROCESO">EN_PROCESO</option>
+        <option value="PENDIENTE_DE_ENTREGA">PENDIENTE_DE_ENTREGA</option>
+        <option value="ENTREGADO">ENTREGADO</option>
+      </select>
+
+      <!-- ==================== VALORES ==================== -->
+      <label>Valor total</label>
+      <input type="number" formControlName="valorTotal" />
+
+      <label>Descuento (%)</label>
+      <input type="number" formControlName="descuento" />
+
+      <!-- ==================== OBSERVACIONES ==================== -->
+      <label>Observaciones</label>
+      <textarea formControlName="observaciones"></textarea>
+
+      <!-- ==================== BOTÓN ==================== -->
+      <button type="submit">
+        {{ isEditing() ? 'Modificar Pedido' : 'Guardar Pedido' }}
+      </button>
+
+    </form>
+  </div>
+</div>

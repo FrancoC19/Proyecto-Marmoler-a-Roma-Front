@@ -1,0 +1,51 @@
+<div class="filtros-container">
+  <input type="text" placeholder="Buscar por nombre" #inputNombre>
+  <button class="btn-filtro" (click)="buscarPorNombre(inputNombre.value)">Buscar</button>
+
+  <select #selectTipo (change)="buscarPorTipo(selectTipo.value)">
+    <option value="">Tipo de material</option>
+    <option value="GRANITO">Granito</option>
+    <option value="MARMOL">Mármol</option>
+    <option value="SILESTONE">Silestone</option>
+    <option value="CUARZO">Cuarzo</option>
+    <option value="SINTERIZADO">Sinterizado</option>
+    <option value="CUARSITA">Cuarsita</option>
+  </select>
+  <button class="btn-filtro" (click)="buscarPorTipo(selectTipo.value)">Filtrar tipo</button>
+
+  <input type="number" placeholder="Buscar por precio" #inputPrecio>
+  <button class="btn-filtro" (click)="buscarPorPrecio(+inputPrecio.value)">Filtrar precio</button>
+
+  <button class="btn-filtro" (click)="cargarMateriales()">Mostrar todos</button>
+</div>
+
+<div class="tabla-container">
+  <h2>Listado de Materiales</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Valor por m²</th>
+        <th>Tipo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (mat of materiales; track $index) {
+        <tr>
+          <td>{{ mat.id }}</td>
+          <td>{{ mat.nombreMaterial }}</td>
+          <td>{{ mat.valorMetroCuadrado }}</td>
+          <td>{{ mat.tipoMaterial }}</td>
+          <td>
+            <button class="btn-editar" (click)="editarMaterial(mat.id!)">Editar</button>
+            @if(auth.esAdmin()){
+            <button class="btn-eliminar" (click)="eliminarMaterial(mat.nombreMaterial)">Eliminar</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

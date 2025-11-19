@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+/* Reset general */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Layout general con flex */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* ocupa toda la ventana */
+}
+
+/* Header fijo */
+header {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  height: 60px; /* ajusta según tu header */
+  z-index: 1000;
+}
+
+/* Main ocupa el resto del espacio y no queda detrás del header */
+main.content {
+  flex: 1;
+  padding: 80px 20px 20px; /* padding-top = altura del header + margen */
+}
+
+/* Footer */
+footer, app-footer {
+  background-color: #5b0b0b;
+  color: white;
+  text-align: center;
+  padding: 15px 0;
+  width: 100%;
+  font-weight: 500;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+}

@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="handleLogin()">
+<fieldset>
+<label for="correo">Correo: </label>
+<input type="text" id="correo" placeholder="Ingrese su correo" formControlName="correo">
+@if(getcorreo().hasError('required')&&(getcorreo().dirty||getcorreo().touched)){
+<span>El correo es requerido</span>
+}
+
+<label for="password">Contrasenia: </label>
+<input type="text"  id="password"  placeholder="Ingrese su Contrasenia" formControlName="password">
+@if(getpassword().dirty||getpassword().touched){
+    @if(getpassword().hasError('required')){
+        <span>La Contraseña es requerido</span>
+    }
+
+}
+
+<button type="submit">Iniciar Sesion</button>
+</fieldset>
+</form>

@@ -1,0 +1,41 @@
+<form [formGroup]="form" (ngSubmit)="handleSubmit()">
+    <fieldset>
+        <legend>Empleados</legend>
+
+        <label for="nombre">Nombre: </label>
+        <input type=" text" id="nombre" placeholder="Ingrese nombre ..." formControlName="nombre">
+        @if(getnombre().hasError('required')&&(getdirty()||gettouched())){
+            <span>El nombre es requerido</span>
+        }
+
+        <label for="dni">DNI: </label>
+        <input type="number" id="dni" placeholder="Ingrese dni.." formControlName="dni">
+        @if(getdni().hasError('required')&&(getdirty()||gettouched())){
+            <span>El DNI es requerido</span>
+        }
+
+        <label for="correo">Email: </label>
+        <input type="email" id="correo" placeholder="Ingrese Email..." formControlName="correo">
+        @if(getdirty()||gettouched()){
+            @if(getcorreo().hasError('required')){
+            <span>El correo es requerido</span>
+            }
+        @if(getcorreo().hasError('email')){
+            <span>El correo debe tener formato Email</span>
+        }}
+
+        <label for="rol">Rol: </label>
+        <select id="rol" formControlName="rolesEmpleado">
+            @for (rol of RolesEmpleados; track $index) {
+                <option [value]="rol">{{rol}}</option>
+            }
+        </select>
+        @if(getrolesEmpleado().hasError('required')&&(getdirty()||gettouched())){
+            <span>El rol es requerido</span>
+        }
+
+        <button type="submit" [disabled]="form.invalid">Agregar</button>
+        <button type="reset">Eliminar</button>
+
+    </fieldset>
+</form>

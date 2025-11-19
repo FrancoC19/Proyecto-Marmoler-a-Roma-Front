@@ -1,0 +1,3 @@
+export enum estadoPedido{
+    EN_PROCESO,PENDIENTE_DE_ENTREGA,ENTREGADO
+}

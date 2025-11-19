@@ -1,0 +1,96 @@
+  <div class="filtros-container">
+
+  <input 
+    type="text" 
+    placeholder="Nombre"
+    [(ngModel)]="filtroNombre"
+    (input)="aplicarFiltros()"
+  />
+
+  <input 
+    type="text" 
+    placeholder="Apellido"
+    [(ngModel)]="filtroApellido"
+    (input)="aplicarFiltros()"
+  />
+
+  <input 
+    type="number" 
+    placeholder="DNI"
+    [(ngModel)]="filtroDni"
+    (input)="aplicarFiltros()"
+  />
+
+  <input 
+    type="text" 
+    placeholder="Correo"
+    [(ngModel)]="filtroCorreo"
+    (input)="aplicarFiltros()"
+  />
+
+  <input 
+    type="number" 
+    placeholder="Teléfono"
+    [(ngModel)]="filtroTelefono"
+    (input)="aplicarFiltros()"
+  />
+
+  <button (click)="cargarClientes()">Limpiar Filtros</button>
+</div>
+
+<div class="tabla-container">
+  <h2>Clientes Registrados</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>DNI</th>
+        <th>Correo</th>
+        <th>Teléfono</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      @for (c of clientes; track c.dni) {
+        <tr>
+          <td>{{ c.nombre }}</td>
+          <td>{{ c.apellido }}</td>
+          <td>{{ c.dni }}</td>
+          <td>{{ c.correo }}</td>
+          <td>{{ c.telefono }}</td>
+
+          <td>
+            <button (click)="editarCliente(c.dni)">Editar</button>
+            @if(auth.esAdmin()){
+            <button (click)="eliminarCliente(c.dni)">Eliminar</button>
+            }
+          </td>
+        </tr>
+      }
+
+      @empty {
+        <tr>
+          <td colspan="6" style="text-align:center; padding:15px;">
+            No hay clientes para mostrar
+          </td>
+        </tr>
+      }
+
+    </tbody>
+  </table>
+</div>
+
+<!-- ============= FORMULARIO DE EDICIÓN ================= -->
+@if (editando) {
+  <h2>Editar Cliente</h2>
+
+  <app-formulario-clientes
+      [clientes]="clienteSeleccionado!"
+      [isEditing]="true"
+      (edited)="refrescarLista($event)"
+  ></app-formulario-clientes>
+}

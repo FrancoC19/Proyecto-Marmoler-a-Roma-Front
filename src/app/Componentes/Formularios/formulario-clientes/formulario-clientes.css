@@ -1,0 +1,122 @@
+form {
+  max-width: 700px;
+  margin: 60px auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  padding: 30px 40px;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+}
+
+fieldset {
+  border: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 30px;
+}
+
+legend {
+  grid-column: span 2;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #6a1b1b; /* bordó oscuro */
+  margin-bottom: 10px;
+  border-bottom: 2px solid #6a1b1b;
+  padding-bottom: 5px;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+  border-color: #6a1b1b;
+  outline: none;
+  box-shadow: 0 0 6px rgba(106, 27, 27, 0.4);
+}
+
+::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+/* === Estilo de los botones === */
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Botón Agregar */
+button[type="submit"] {
+  background-color: #6a1b1b;
+  color: white;
+}
+
+button[type="submit"]:hover {
+  background-color: #8b2a2a;
+  transform: translateY(-2px);
+}
+
+/* Botón Eliminar */
+button[type="reset"] {
+  background-color: #c62828;
+  color: white;
+}
+
+button[type="reset"]:hover {
+  background-color: #e53935;
+  transform: translateY(-2px);
+}
+
+/* Contenedor de botones en una sola fila */
+button[type="submit"],
+button[type="reset"] {
+  grid-column: span 1;
+}
+
+fieldset > button[type="submit"] {
+  justify-self: end;
+}
+
+fieldset > button[type="reset"] {
+  justify-self: start;
+}
+
+/* === Responsive para pantallas chicas === */
+@media (max-width: 600px) {
+  fieldset {
+    grid-template-columns: 1fr;
+  }
+
+  legend {
+    grid-column: span 1;
+  }
+
+  button[type="submit"],
+  button[type="reset"] {
+    grid-column: span 1;
+    width: 100%;
+  }
+
+  fieldset > button {
+    justify-self: stretch;
+  }
+}
