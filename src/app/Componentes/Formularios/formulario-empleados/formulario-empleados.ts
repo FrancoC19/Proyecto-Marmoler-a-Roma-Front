@@ -31,7 +31,7 @@ export class FormularioEmpleados {
   ]
 
     protected readonly form= this.fb.nonNullable.group({  
-      dni:[0,[Validators.required]],
+      dni:[0,[Validators.required,Validators.minLength(7), Validators.maxLength(7)]],
       correo:['',[Validators.required,Validators.email]],
       nombre:['',Validators.required],
       rolesEmpleado:['',Validators.required]

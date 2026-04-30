@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, OnInit, output } from '@angular/core';
+import { Component, effect, inject, input, OnInit, output, signal } from '@angular/core';
 import { PedidosService } from '../../../Services/pedidosService';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { pedidos } from '../../../Models/Pedidos';
@@ -11,6 +11,9 @@ import { empleado } from '../../../Models/Empleado';
 import { material } from '../../../Models/Materiales';
 import { piletas } from '../../../Models/Piletas';
 import { ActivatedRoute } from '@angular/router';
+import { pediDTO } from '../../../Models/PedidosDTO';
+import { Direccion } from '../../../Models/Direccion';
+import { PedidoFull } from '../../../Models/PedidoFull';
 
 
 @Component({
@@ -28,33 +31,32 @@ export class FormularioPedidos implements OnInit {
   private readonly fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
 
-
   readonly pedidos = input<pedidos>();
   readonly edited = output<pedidos>();
+  readonly editedDTO = output<pediDTO>();
+  
+  isEditing = signal(false);
 
-  pedidoActual?: pedidos;
-  isEditingFlag = false;
   empleados: empleado[] = [];
   materiales: material[] = [];
   piletas: piletas[] = [];
+  direccionesCliente = signal<Direccion[]>([]);
 
-  // 🔎 Listado que aparece al buscar
   clienteBusqueda: string = "";
   clientesFiltrados: cliente[] = [];
   clienteSeleccionado: cliente | null = null;
 
  ngOnInit() {
-  
-const id = Number(this.route.snapshot.paramMap.get('id'));
-
+  const id = this.route.snapshot.paramMap.get('id');
+  //cargar el pedido
   if (id) {
-    this.isEditingFlag = true; // variable interna
-    this.client.getById(id).subscribe({
-      next: (pedido) => {
-        this.pedidoActual = pedido; // guardás pedido
-        this.cargarDatosEnFormulario(pedido);
+    this.isEditing.set(true);
+
+    this.client.getById(Number(id)).subscribe({
+      next: pedido => {
+        this.rellenarFormulario(pedido);
       },
-      error: () => alert("No se encontró el pedido")
+      error: () => console.error("Error obteniendo pedido")
     });
   }
   // Cargar empleados
@@ -74,78 +76,18 @@ const id = Number(this.route.snapshot.paramMap.get('id'));
     next: data => this.piletas = data,
     error: () => console.error("Error cargando piletas")
   });
-
-
-  // 🔥 SI ESTÁ EDITANDO → precarga los datos en el formulario
-  if (this.isEditing() && this.pedidos()) {
-    const p = this.pedidos()!;
-
-    this.form.patchValue({
-      observaciones: p.observaciones,
-      cliente: p.cliente?.dni ?? null,
-      empleado: p.empleado?.dni ?? null,
-      material: this.materiales.find(m => m.id === p.material?.id) ?? null,
-      pileta: this.piletas.find(pl => pl.id === p.pileta?.id) ?? null,
-      griferia: p.griferia,
-      moldura: p.moldura,
-      senia: p.senia,
-      fechaEntrega: p.fechaEntrega,
-      fechaEmision: p.fechaEmision,
-      metrosCuadrados: p.metrosCuadrados,
-      direccion: {
-        calle: p.direccion?.calle,
-        numero: String(p.direccion.numero),
-        localidad: p.direccion?.localidad,
-      },
-      estado: p.estado,
-      valorTotal: p.valorTotal,
-      descuento: p.descuento,
-    });
-
-    // Guardar el cliente elegido
-    if (p.cliente) this.form.patchValue({ cliente: p.cliente.dni });
-   }
 }
-
-cargarDatosEnFormulario(p: pedidos) {
-  this.form.patchValue({
-    observaciones: p.observaciones,
-    cliente: p.cliente?.dni ?? null,
-    empleado: p.empleado?.dni ?? null,
-    material: this.materiales.find(m => m.id === p.material?.id) ?? null,
-    pileta: this.piletas.find(pl => pl.id === p.pileta?.id) ?? null,
-    griferia: p.griferia,
-    moldura: p.moldura,
-    senia: p.senia,
-    fechaEntrega: p.fechaEntrega,
-    fechaEmision: p.fechaEmision,
-    metrosCuadrados: p.metrosCuadrados,
-    direccion: {
-      calle: p.direccion?.calle,
-      numero: String(p.direccion.numero),
-      localidad: p.direccion?.localidad,
-    },
-    estado: p.estado,
-    valorTotal: p.valorTotal,
-    descuento: p.descuento,
-  });
-
-  if (p.cliente) this.clienteSeleccionado = p.cliente as cliente;
-}
-
 
 
   // ---------------------- Formulario ----------------------
   protected readonly form = this.fb.group({
     observaciones: [''],
 
-    // Cliente sigue siendo solo el ID
     cliente: [null as number | null, Validators.required],
 
-    // Ahora control completo para seleccionar objeto
     empleado: [null as number | null, Validators.required],
-    material: [null as material | null, Validators.required],
-    pileta: [null as piletas|null, Validators.required],
+    material: [null as number | null, Validators.required],
+    pileta: [null as number|null, Validators.required],
 
     griferia: ['', Validators.required],
     moldura: [''],
@@ -160,7 +102,6 @@ cargarDatosEnFormulario(p: pedidos) {
       localidad: ['', Validators.required],
     }),
 
-    estado: ['EN_PROCESO', Validators.required],
     valorTotal: [0],
     descuento: [0],
   });
@@ -191,148 +132,157 @@ cargarDatosEnFormulario(p: pedidos) {
   }
 
   seleccionarCliente(c: cliente) {
-    this.form.patchValue({ cliente: c.dni });
-    this.clienteSeleccionado = c;
-    this.clientesFiltrados = [];
+  this.clienteSeleccionado = c;
+  this.clienteBusqueda = `${c.nombre} ${c.apellido}`;
+  this.form.patchValue({ cliente: c.dni });
+
+  // cargar direcciones
+  this.clienteService.getDireccionesByDni(c.dni).subscribe({
+    next: (dirs) => {
+      this.direccionesCliente.set(dirs);
+
+      // limpiar campos de dirección si cambio de cliente
+      this.direccion.reset();
+    }
+  });
+
+  this.clientesFiltrados = [];
+}
+
+onDireccionSeleccionada(event: any) {
+  const index = event.target.value;
+
+  if (index === "" || index === null) {
+    this.direccion.reset();
+    return;
   }
 
-  // ---------------------- Construir pedido para backend ----------------------
-  private construirPedidoParaBackend() {
-  const raw = this.form.getRawValue();
+  const seleccionada = this.direccionesCliente()[index];
 
-  return {
-    observaciones: raw.observaciones ?? '',
+  this.direccion.patchValue({
+    calle: seleccionada.calle,
+    numero: seleccionada.numero,
+    localidad: seleccionada.localidad
+  });
+}
 
-    // Cliente
-    cliente: {dni: raw.cliente! },
+  //--------------------- Buscar el pedido ------------------------
 
-    // Empleado
-    empleado: { dni: raw.empleado! },
-
-    // Material
-    material: { id: raw.material!.id! },
-
-    // Pileta
-    pileta: { id: raw.pileta!.id! },
-
-    griferia: raw.griferia!,
-    moldura: raw.moldura || '',
-
-    fechaEntrega: raw.fechaEntrega!,
-    fechaEmision: raw.fechaEmision!,
-    metrosCuadrados: raw.metrosCuadrados!,
-
-    direccion: {
-      calle: raw.direccion!.calle!,
-      numero: Number(raw.direccion!.numero),
-      localidad: raw.direccion!.localidad!
+  cargarPedidoParaEditar(id: number) {
+  this.client.getById(id).subscribe({
+    next: (pedido) => {
+      this.rellenarFormulario(pedido);
     },
-
-    estado: raw.estado!,
-    valorTotal: raw.valorTotal ?? 0,
-    descuento: raw.descuento ?? 0,
-    senia: raw.senia ?? 0
-  };
+    error: (err) => {
+      console.error("Error cargando pedido:", err);
+      alert("No se pudo cargar el pedido");
+    }
+  });
 }
 
-isEditing(){
-  return this.isEditingFlag;
+rellenarFormulario(pedido: PedidoFull) {
+  this.form.patchValue({
+    observaciones: pedido.observaciones,
+    cliente: pedido.cliente.dni,
+    empleado: pedido.empleado.dni,
+    material: pedido.material.id,
+    pileta: pedido.pileta.id,
+    griferia: pedido.griferia,
+    moldura: pedido.moldura,
+    senia: pedido.senia,
+    fechaEntrega: pedido.fechaEntrega,
+    fechaEmision: pedido.fechaEmision,
+    metrosCuadrados: pedido.metrosCuadrados,
+    descuento: pedido.descuento,
+    direccion: {
+      calle: pedido.direccion.calle,
+      numero: pedido.direccion.numero.toString(),
+      localidad: pedido.direccion.localidad
+    }
+  });
+
+  // opcional: seleccionar cliente automáticamente
+  this.clienteBusqueda = `${pedido.cliente.nombre} ${pedido.cliente.apellido}`;
+  this.clienteSeleccionado = pedido.cliente;
+  this.direccionesCliente.set(pedido.cliente.direcciones);
 }
 
-  // ---------------------- Guardar o editar ----------------------
-guardar() {
+
+
+
+  // ---------------------- Construir pedido ----------------------
+  private construirPedidoParaBackend() {
+    const raw = this.form.getRawValue();
+
+    return {
+      observaciones: raw.observaciones ?? '',
+
+      clienteDni: raw.cliente!,
+      empleadoDni: raw.empleado!,
+      materialId: raw.material!,
+      piletaId: raw.pileta!,
+
+      senia: raw.senia ?? 0,
+
+      griferia: raw.griferia!,
+      moldura: raw.moldura || '',
+
+      fechaEntrega: raw.fechaEntrega!,
+      fechaEmision: raw.fechaEmision!,
+
+      metrosCuadrados: raw.metrosCuadrados!,
+      descuento: raw.descuento ?? 0,
+
+      direccion: {
+        calle: raw.direccion!.calle!,
+        numero: raw.direccion!.numero!,
+        localidad: raw.direccion!.localidad!
+      }
+    };
+  }
+
+  // ---------------------- Guardar ----------------------
+  guardar() {
   if (this.form.invalid) {
     this.form.markAllAsTouched();
     return;
   }
 
-  const raw = this.form.getRawValue();
+  const dto = this.construirPedidoParaBackend();
+  const id = this.route.snapshot.paramMap.get('id');
 
-  // 🔹 Función para registrar un nuevo pedido
-  const registrarPedido = () => {
-    const pedidoNuevo = this.construirPedidoParaBackend();
-    this.client.agregarPedido(pedidoNuevo).subscribe({
+  // MODO EDICIÓN
+  if (id) {
+    this.client.modificarPedido(Number(id), dto).subscribe({
       next: () => {
-        alert("Pedido guardado correctamente");
-        this.edited.emit(pedidoNuevo);
-        this.form.reset();
-
-        // 🔹 Actualizar stock de la pileta
-        const piletaId = pedidoNuevo.pileta.id;
-        if (piletaId) {
-          const nuevaCantidad = (this.piletas.find(p => p.id === piletaId)?.cantidad ?? 1) - 1;
-          if (nuevaCantidad >= 0) {
-            this.piletasService.actualizarStock(piletaId, nuevaCantidad).subscribe({
-              next: () => this.cargarPiletas(),
-              error: err => console.error("Error actualizando stock de pileta", err)
-            });
-          } else {
-            alert("No hay stock suficiente para esta pileta");
-          }
-        }
+        alert("Pedido modificado correctamente");
       },
-      error: err => {
+      error: (err) => {
         console.error(err);
-        alert("Error al guardar el pedido");
+        alert("Error al modificar el pedido");
       }
     });
-  };
 
-  if (!this.isEditing()) {
-    registrarPedido();
     return;
   }
 
-  // 🔹 EDITAR PEDIDO EXISTENTE
-  if (!this.pedidoActual) {
-    alert("No se ha cargado el pedido para editar.");
-    return;
-  }
-
-  // Copiar el pedidoActual completo y aplicar cambios del form
- const pedidoParaEditar: pedidos = {
-  ...this.pedidoActual,
-  observaciones: raw.observaciones ?? this.pedidoActual.observaciones,
-  senia: raw.senia ?? this.pedidoActual.senia,
-  griferia: raw.griferia ?? this.pedidoActual.griferia,
-  moldura: raw.moldura ?? this.pedidoActual.moldura,
-  fechaEntrega: raw.fechaEntrega ?? this.pedidoActual.fechaEntrega,
-  fechaEmision: raw.fechaEmision ?? this.pedidoActual.fechaEmision,
-  metrosCuadrados: raw.metrosCuadrados ?? this.pedidoActual.metrosCuadrados,
-  descuento: raw.descuento ?? this.pedidoActual.descuento,
-  estado: raw.estado ?? this.pedidoActual.estado,
-  valorTotal: raw.valorTotal ?? this.pedidoActual.valorTotal,
-  direccion: {
-    ...this.pedidoActual.direccion,
-    calle: raw.direccion.calle ?? this.pedidoActual.direccion?.calle,
-    numero: Number(raw.direccion.numero) ?? this.pedidoActual.direccion?.numero,
-    localidad: raw.direccion.localidad ?? this.pedidoActual.direccion?.localidad
-  },
-  // 🔹 Relaciones actualizadas desde el formulario
-  cliente: raw.cliente ? { dni: raw.cliente } : this.pedidoActual.cliente,
-  empleado: raw.empleado ? { dni: raw.empleado } : this.pedidoActual.empleado,
-  material: raw.material ? { id: raw.material.id ?? null } : this.pedidoActual.material,
-  pileta: raw.pileta ? { id: raw.pileta.id ?? null } : this.pedidoActual.pileta
-};
-
-  this.client.modificarPedido(this.pedidoActual.idPedido!, pedidoParaEditar).subscribe({
+  // MODO ALTA
+  this.client.agregarPedido(dto).subscribe({
     next: () => {
-      alert("Pedido modificado correctamente");
-      this.edited.emit(pedidoParaEditar);
-
-      // 🔹 Actualizar stock si cambió la pileta
-      const piletaId = pedidoParaEditar.pileta?.id;
-      if (piletaId) this.cargarPiletas();
+      alert("Pedido guardado correctamente");
+      this.form.reset();
+      this.editedDTO.emit(dto);
     },
-    error: err => {
+    error: (err) => {
       console.error(err);
-      alert("Error al modificar el pedido");
+      alert("Error al guardar el pedido");
     }
   });
 }
 
 
-// 🔹 Método para refrescar la lista de piletas
-cargarPiletas() {
-  this.piletasService.getAll().subscribe
-}}
+  // Recargar piletas
+  cargarPiletas() {
+    this.piletasService.getAll().subscribe();
+  }
+}

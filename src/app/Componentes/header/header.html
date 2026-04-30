@@ -36,6 +36,7 @@
             <li><a class="dropdown-item" routerLink="TablaMateriales">Materiales</a></li>
             <li><a class="dropdown-item" routerLink="TablaClientes">Clientes</a></li>
             <li><a class="dropdown-item" routerLink="TablaPedidos">Pedidos</a></li>
+            <li><a class="dropdown-item" routerLink="TablaPedidosEntregados">Pedidos Entregados</a></li>
           </ul>
         </li>
 
@@ -85,7 +86,7 @@
     }
   </button>
 
-  <ul class="dropdown-menu dropdown-menu-end" [class.show]="mostrarDropdown">
+  <ul class="dropdown-menu dropdown-menu-end notificaciones-menu dropdown-notificaciones" [class.show]="mostrarDropdown">
     @if (notificaciones.length === 0) {
       <li class="dropdown-item text-muted">
         Sin notificaciones

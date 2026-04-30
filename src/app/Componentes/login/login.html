@@ -6,8 +6,8 @@
 <span>El correo es requerido</span>
 }
 
-<label for="password">Contrasenia: </label>
-<input type="text"  id="password"  placeholder="Ingrese su Contrasenia" formControlName="password">
+<label for="password">Contraseña: </label>
+<input type="password"  id="password"  placeholder="Ingrese su Contraseña" formControlName="password">
 @if(getpassword().dirty||getpassword().touched){
     @if(getpassword().hasError('required')){
         <span>La Contraseña es requerido</span>

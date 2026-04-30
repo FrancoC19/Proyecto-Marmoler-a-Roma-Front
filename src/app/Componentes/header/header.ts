@@ -4,6 +4,7 @@ import { AuthService } from '../../Services/auth-service';
 import { interval } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Notificacion } from '../../Models/Notificacion';
+import { OnInit } from '@angular/core';
 
 @Component({
   selector: 'header',
@@ -20,9 +21,7 @@ export class Header {
   public mostrarDropdown = false;
 
   toggleDropdown() {
-    if (this.mostrarDropdown) {
-      this.cargarNotificaciones();
-    }
+    this.cargarNotificaciones();
     this.mostrarDropdown = !this.mostrarDropdown;
   }
 
@@ -43,5 +42,9 @@ export class Header {
   logout() {
     this.auth.logout();
     this.router.navigateByUrl('/login');
+  }
+
+  ngOnInit() {
+    this.cargarNotificaciones(); 
   }
 }

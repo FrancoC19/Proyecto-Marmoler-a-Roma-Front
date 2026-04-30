@@ -12,11 +12,14 @@ import { TablaClientes } from './Componentes/Tablas/tabla-clientes/tabla-cliente
 import { FormularioUsuario } from './Componentes/Formularios/formulario-usuario/formulario-usuario';
 import { TablaUsuarios } from './Componentes/Tablas/tabla-usuarios/tabla-usuarios';
 import { DetailPedidos } from './Componentes/Details/detail-pedidos/detail-pedidos';
+import { TablaPedidosEntregados } from './Componentes/Tablas/tabla-pedidos-entregados/tabla-pedidos-entregados';
+import { DetailPedidosFinalizados } from './Componentes/Details/detail-pedidos/detail-pedidos-finalizados/detail-pedidos-finalizados';
 
 export const routes: Routes = [
     { path:'', redirectTo:'login', pathMatch:'full'},
     {path:'login', component:Login, title:"login"},
     {path:'TablaPedidos',component:TablaPedidos},
+    {path:'TablaPedidosEntregados',component:TablaPedidosEntregados},
     {path:'FormularioPedidos',component:FormularioPedidos},
     {path:'TablaPiletas',component:TablaPiletas},
     {path:'TablaMateriales', component:TablaMateriales},
@@ -32,6 +35,7 @@ export const routes: Routes = [
     { path: 'FormularioUsuarios/:id', component: FormularioUsuario }, 
     { path: 'TablaUsuarios', component: TablaUsuarios} ,
     {path:'DetallesPedidos/:id', component:DetailPedidos},
+    {path:'DetallesEntregados/:id', component:DetailPedidosFinalizados},
     {path:'FormularioPedidos/:id',component:FormularioPedidos},
     { path: '**', redirectTo: 'login' }
 

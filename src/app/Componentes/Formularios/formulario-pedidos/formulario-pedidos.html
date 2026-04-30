@@ -5,7 +5,6 @@
 
     <form [formGroup]="form" (ngSubmit)="guardar()" class="formulario">
 
-      <!-- ==================== CLIENTE ==================== -->
       <div style="margin-top:20px;">
         <label>Cliente (buscar por DNI o nombre)</label>
         <input type="text"
@@ -14,7 +13,6 @@
               placeholder="Escribí DNI o nombre..." />
       </div>
 
-      <!-- Lista de sugerencias -->
       @if (clientesFiltrados.length > 0) {
         <ul class="sugerencias">
           @for (c of clientesFiltrados; track $index) {
@@ -25,7 +23,6 @@
         </ul>
       }
 
-      <!-- Cliente seleccionado -->
       @if (clienteSeleccionado) {
         <div class="seleccionado">
           <strong>Cliente seleccionado:</strong>
@@ -33,10 +30,11 @@
         </div>
       }
 
-      <!-- Campo oculto del form -->
       <input type="hidden" formControlName="cliente" />
+       @if(form.controls.cliente.hasError('required') && (form.dirty || form.touched)) {
+        <span>El cliente es requerido</span>
+      }
 
-      <!-- ==================== EMPLEADO ==================== -->
       <label>Empleado</label>
       <select formControlName="empleado">
         <option [value]="">Seleccione un empleado</option>
@@ -46,75 +44,118 @@
           </option>
         }
       </select>
+      @if(form.controls.empleado.hasError('required') && (form.dirty || form.touched)) {
+        <span>El empleado es requerido</span>
+      }
 
-      <!-- ==================== MATERIAL ==================== -->
       <label>Material</label>
       <select formControlName="material">
-        <option [ngValue]="null">Seleccione un material</option>
+        <option [value]="null">Seleccione un material</option>
         @for (mat of materiales; track $index) {
-          <option [ngValue]="mat">
+          <option [value]="mat.id">
             {{ mat.nombreMaterial }} — ${{ mat.valorMetroCuadrado }}
           </option>
         }
       </select>
+      @if(form.controls.material.hasError('required') && (form.dirty || form.touched)) {
+        <span>El material es requerido</span>
+      }
 
-      <!-- ==================== PILETA ==================== -->
       <label>Piletas:</label>
-<select formControlName="pileta">
-  <option [ngValue]="null">Seleccione una pileta</option>
-  @for (p of piletas; track $index) {
-    <option [ngValue]="p">
-      {{ p.marca }} — {{ p.modelo }} (Stock: {{ p.cantidad }})
-    </option>
-  }
-</select>
+      <select formControlName="pileta">
+        <option [value]="null">Seleccione una pileta</option>
+        @for (p of piletas; track $index) {
+          <option [value]="p.id">
+            {{ p.marca }} — {{ p.modelo }} (Stock: {{ p.cantidad }})
+          </option>
+        }
+      </select>
+       @if(form.controls.pileta.hasError('required') && (form.dirty || form.touched)) {
+        <span>La pileta es requerida</span>
+      }
 
-      <!-- ==================== GRIFERÍA ==================== -->
       <label>Grifería</label>
       <input type="text" formControlName="griferia" />
+      @if(form.controls.griferia.hasError('required') && (form.dirty || form.touched)) {
+        <span>La grifería es requerida</span>
+      }
 
-      <!-- ==================== MOLDURA ==================== -->
       <label>Moldura</label>
       <input type="text" formControlName="moldura" />
+      @if(form.controls.moldura.hasError('required') && (form.dirty || form.touched)) {
+        <span>La grifería es requerida</span>
+      }
 
-      <!-- ==================== SEÑA ==================== -->
       <label>Seña</label>
       <input type="number" formControlName="senia" />
+       @if(form.controls.senia.hasError('required') && (form.dirty || form.touched)) {
+        <span>La seña es requerida</span>
+      }
+      @if(form.controls.senia.hasError('min') && (form.dirty || form.touched)) {
+        <span>La seña no puede ser negativa</span>
+      }
 
-      <!-- ==================== FECHAS ==================== -->
       <label>Fecha de entrega</label>
       <input type="date" formControlName="fechaEntrega" />
+      @if(form.controls.fechaEntrega.hasError('required') && (form.dirty || form.touched)) {
+        <span>La fecha de entrega es requerida</span>
+      }
 
       <label>Fecha de emisión</label>
       <input type="date" formControlName="fechaEmision" />
+      @if(form.controls.fechaEmision.hasError('required') && (form.dirty || form.touched)) {
+        <span>La fecha de emisión es requerida</span>
+      }
 
-      <!-- ==================== M2 ==================== -->
       <label>Metros cuadrados</label>
       <input type="number" formControlName="metrosCuadrados" />
+      @if(form.controls.metrosCuadrados.hasError('required') && (form.dirty || form.touched)) {
+        <span>Los metros cuadrados son requeridos</span>
+      }
+      @if(form.controls.metrosCuadrados.hasError('min') && (form.dirty || form.touched)) {
+        <span>Los metros cuadrados no pueden ser negativos</span>
+      }
 
-      <!-- ==================== DIRECCIÓN ==================== -->
-      <div [formGroup]="direccion">
-        <h4>Dirección</h4>
-        <label>Calle</label>
-        <input formControlName="calle" type="text" />
-        <label>Número</label>
-        <input formControlName="numero" type="text" />
-        <label>Localidad</label>
-        <input formControlName="localidad" type="text" />
-      </div>
+@if (direccionesCliente().length > 0) {
 
-      <!-- ==================== ESTADO ==================== -->
-      <label>Estado</label>
-      <select formControlName="estado">
-        <option value="EN_PROCESO">EN_PROCESO</option>
-        <option value="PENDIENTE_DE_ENTREGA">PENDIENTE_DE_ENTREGA</option>
-        <option value="ENTREGADO">ENTREGADO</option>
-      </select>
+  <label>Direcciones del cliente</label>
+  <select id="selectDirecciones" (change)="onDireccionSeleccionada($event)">
+    <option [value]="''">Seleccione una dirección</option>
+
+    @for (d of direccionesCliente(); track $index) {
+      <option [value]="$index">
+        {{ d.calle }} {{ d.numero }} — {{ d.localidad }}
+      </option>
+    }
+  </select>
+
+}
+
+<div [formGroup]="direccion">
+  <h4>Dirección</h4>
+
+  <label>Calle</label>
+  <input formControlName="calle" type="text" />
+  @if(direccion.controls['calle'].hasError('required') && (form.dirty || form.touched)){
+          <span>La calle es requerida</span>
+        }
+
+  <label>Número</label>
+  <input formControlName="numero" type="text" />
+  @if(direccion.controls['numero'].hasError('required') && (form.dirty || form.touched)){
+          <span>El número es requerido</span>
+        }
+
+  <label>Localidad</label>
+  <input formControlName="localidad" type="text" />
+   @if(direccion.controls['localidad'].hasError('required') && (form.dirty || form.touched)){
+          <span>La localidad es requerida</span>
+        }
+</div>
+
 
       <!-- ==================== VALORES ==================== -->
-      <label>Valor total</label>
-      <input type="number" formControlName="valorTotal" />
-
+     
       <label>Descuento (%)</label>
       <input type="number" formControlName="descuento" />
 

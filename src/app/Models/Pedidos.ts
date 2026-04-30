@@ -27,7 +27,7 @@ export interface pedidos {
   numero: Number;   
   localidad: string;
 };
-  estado: string;
+  estado?: string;
   valorTotal: number;
 
   descuento?: number;

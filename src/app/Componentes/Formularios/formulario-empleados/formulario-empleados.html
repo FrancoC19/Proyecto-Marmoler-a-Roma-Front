@@ -13,7 +13,10 @@
         @if(getdni().hasError('required')&&(getdirty()||gettouched())){
             <span>El DNI es requerido</span>
         }
-
+        @if((getdni().hasError('minlength') || getdni().hasError('maxlength')) && (getdirty() || gettouched())){
+            <span>El DNI debe tener 7 dígitos</span>
+        }
+        
         <label for="correo">Email: </label>
         <input type="email" id="correo" placeholder="Ingrese Email..." formControlName="correo">
         @if(getdirty()||gettouched()){

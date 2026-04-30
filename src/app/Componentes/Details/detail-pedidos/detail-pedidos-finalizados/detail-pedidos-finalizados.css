@@ -79,7 +79,7 @@
   border-radius: 6px;
   color: #fff;
   font-weight: bold;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 /* COLORES DE ESTADO */
@@ -109,5 +109,4 @@
   margin-top: 25px;
   display: flex;
   justify-content: center;
-  gap: 15px;
 }

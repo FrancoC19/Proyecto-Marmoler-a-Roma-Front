@@ -44,3 +44,30 @@
   font-weight: 600;
 }
 
+/* Arreglar posición del dropdown de notificaciones */
+.dropdown-menu-end {
+  right: 0 !important;
+  left: auto !important;
+  transform: translateX(-30%) !important; /* desplazalo hacia adentro */
+  max-width: 350px;
+  white-space: normal;       /* Permite salto de línea */
+  word-wrap: break-word;     /* Rompe palabras largas */
+}
+
+/* 🔥 Dropdown de notificaciones más ancho */
+.dropdown-menu.notificaciones-menu {
+  max-width: none !important;   /* Elimina el límite */
+  width: auto !important;       /* Se adapta al contenido */
+  white-space: normal !important; /* Permite varias líneas si lo necesitás */
+  padding: 10px 15px;
+}
+
+.dropdown-notificaciones {
+  left: auto !important;
+  right: 0 !important;     /* Alineado al borde derecho del botón */
+  transform: none !important;
+  max-width: 350px;        /* Ajustale si querés más ancho */
+  white-space: normal;     /* Hace que el texto haga salto de línea */
+}
+
+
