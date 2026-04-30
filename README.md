@@ -1,59 +1,117 @@
-# MarmoleriaRomaFront
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.4.
 
-## Development server
+# Marmolería Roma - Sistema de Gestión
 
-To start a local development server, run:
+Sistema completo de gestión de pedidos, clientes, empleados ,materiales y piletas para la Marmolería Roma.
 
-```bash
+Incluye:
+- **Frontend:** Angular 20
+- **Backend:** Spring Boot
+- **Java:** 22
+
+---
+
+## 📌 Descripción
+
+Este proyecto permite gestionar:
+
+- Empleados y sus roles.  
+- Clientes y direcciones asociadas.  
+- Materiales, piletas, molduras y grifería.  
+- Pedidos completos con cliente, empleado, material, pileta, seña y dirección.  
+- Observaciones, fechas, descuentos y cálculos automáticos.
+
+El frontend tiene formularios reactivos con validaciones y listados dinámicos.  
+El backend provee API REST para interactuar con la base de datos.
+
+---
+
+## Tecnologías 
+
+| Área        | Tecnología / Librería |        
+|------------|------------------------|
+| Frontend   | Angular CLI            |      
+| Frontend   | Angular Core           |    
+| Frontend   | Node.js                |   
+| Frontend   | npm                    |    
+| Frontend   | TypeScript             |      
+| Frontend   | RxJS                   |     
+| Frontend   | Zone.js                |      
+| Backend    | Java                   |     
+| Backend    | Spring Boot            |     
+| Backend    | Maven                  |     
+| Base de datos | MySQL               |     
+
+---
+
+### Instalación y ejecución
+
+## Backend (Spring Boot)
+
+1. Clonar el repositorio y entrar al directorio backend:
+
+git clone <URL_DEL_REPOSITORIO>
+cd MarmoleriaRomaBackend
+
+2. Ejecutar el proyecto en IntellIJIDEA o aplicacion similar
+
+3. Remplasar los datos de la base de datos en "application.properties"
+
+4. Ejecutar
+--La API REST quedará disponible en http://localhost:8080
+
+## Frontend (Angular)
+
+1. Entrar al directorio frontend
+   
+cd MarmoleriaRomaFront
+
+2. Instalar dependencias:
+
+npm install
+
+3. Ejecutar
+
 ng serve
-```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+-- Abrir en navegador: http://localhost:4200
 
-## Code scaffolding
+### Estructura General del proyecto
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+MarmoleriaRomaBackend/
+ ├─ src/main/java/...
+ │   ├─ controllers/       # Controladores REST
+ │   ├─ services/          # Lógica de negocio
+ │   ├─ models/            # Entidades JPA
+ │   ├─ repositories/      # Interfaces JPA
+ ├─ src/main/resources/    # application.properties, SQL iniciales
 
-```bash
-ng generate component component-name
-```
+MarmoleriaRomaFront/
+ ├─ src/app/
+ │   ├─ Componentes/       # Formularios, Listados, UI
+ │   ├─ Models/            # Modelos de datos
+ │   ├─ Services/          # Servicios HTTP
+ ├─ assets/                # Recursos estáticos
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Uso
 
-```bash
-ng generate --help
-```
+- Los formularios del frontend tienen validaciones (campos obligatorios, email, DNI de 7 dígitos, números positivos).
 
-## Building
+- Los desplegables (select) cargan datos dinámicamente desde la API REST.
 
-To build the project run:
+- Permite buscar clientes por DNI o nombre, seleccionar direcciones y asignar empleados/materiales/piletas a pedidos.
 
-```bash
-ng build
-```
+- Guardar, modificar y eliminar registros tanto de clientes como de empleados y pedidos.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Notas adicionales
 
-## Running unit tests
+- Backend y frontend deben ejecutarse simultáneamente para funcionar correctamente.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- Validaciones incluidas: campos requeridos, email válido, números positivos, DNI argentino.
 
-```bash
-ng test
-```
 
-## Running end-to-end tests
 
-For end-to-end (e2e) testing, run:
 
-```bash
-ng e2e
-```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
-## Additional Resources
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
