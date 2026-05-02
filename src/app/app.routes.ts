@@ -14,6 +14,7 @@ import { TablaUsuarios } from './Componentes/Tablas/tabla-usuarios/tabla-usuario
 import { DetailPedidos } from './Componentes/Details/detail-pedidos/detail-pedidos';
 import { TablaPedidosEntregados } from './Componentes/Tablas/tabla-pedidos-entregados/tabla-pedidos-entregados';
 import { DetailPedidosFinalizados } from './Componentes/Details/detail-pedidos/detail-pedidos-finalizados/detail-pedidos-finalizados';
+import { Dashboard } from './Componentes/dashboard/dashboard';
 
 export const routes: Routes = [
     { path:'', redirectTo:'login', pathMatch:'full'},
@@ -37,6 +38,7 @@ export const routes: Routes = [
     {path:'DetallesPedidos/:id', component:DetailPedidos},
     {path:'DetallesEntregados/:id', component:DetailPedidosFinalizados},
     {path:'FormularioPedidos/:id',component:FormularioPedidos},
+    {path:'dashboard', component:Dashboard},
     { path: '**', redirectTo: 'login' }
 
 ];

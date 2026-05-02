@@ -1,0 +1,71 @@
+<div class="dashboard-container">
+
+  <h2 class="titulo-tabla">Panel de Estadísticas</h2>
+
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <span>Período:</span>
+    <button [class.activo]="periodoActivo === 'semana'" (click)="aplicarPeriodo('semana')">
+      Última semana
+    </button>
+    <button [class.activo]="periodoActivo === 'mes'" (click)="aplicarPeriodo('mes')">
+      Último mes
+    </button>
+    <button [class.activo]="periodoActivo === 'anio'" (click)="aplicarPeriodo('anio')">
+      Último año
+    </button>
+
+    <span class="separador">|</span>
+
+    <span>Personalizado:</span>
+    <input type="date" [value]="desde" />
+    <span>hasta</span>
+    <input type="date" [value]="hasta" />
+    <button [class.activo]="periodoActivo === 'custom'" (click)="aplicarPersonalizado()">
+      Aplicar
+    </button>
+  </div>
+
+  <!-- Error -->
+  @if (error) {
+    <div class="error-msg">{{ error }}</div>
+  }
+
+  <!-- Loading -->
+  @if (cargando) {
+    <div class="loading">Cargando datos...</div>
+  }
+
+  @if (!cargando) {
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-label">Total m² vendidos</span>
+        <span class="kpi-value">{{ totalMetros }}</span>
+        <span class="kpi-sub">en el período seleccionado</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Total pedidos</span>
+        <span class="kpi-value">{{ totalPedidos }}</span>
+        <span class="kpi-sub">en el período seleccionado</span>
+      </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Metros cuadrados por material</h3>
+        <div class="chart-wrap">
+          <canvas #chartMetros></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Pedidos por estado</h3>
+        <div class="chart-wrap">
+          <canvas #chartEstados></canvas>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
