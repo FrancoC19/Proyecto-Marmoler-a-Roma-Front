@@ -69,6 +69,7 @@
             {{ p.marca }} — {{ p.modelo }} (Stock: {{ p.cantidad }})
           </option>
         }
+        <option>Cliente</option>
       </select>
        @if(form.controls.pileta.hasError('required') && (form.dirty || form.touched)) {
         <span>La pileta es requerida</span>
