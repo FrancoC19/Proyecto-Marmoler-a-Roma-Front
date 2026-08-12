@@ -1,0 +1,12 @@
+footer{
+    position: flex;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color:#5b0b0b;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-family: "Roboto", sans-serif;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}

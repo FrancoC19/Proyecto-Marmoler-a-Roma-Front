@@ -1,0 +1,49 @@
+<div class="filtros-container">
+  <input type="text" placeholder="Buscar por marca" #inputMarca>
+  <button (click)="buscarPorMarca(inputMarca.value)">Buscar</button>
+
+  <input type="text" placeholder="Buscar por modelo" #inputModelo>
+  <button (click)="buscarPorModelo(inputModelo.value)">Buscar</button>
+
+  <button (click)="cargarPiletas()">Mostrar todos</button>
+</div>
+
+<div class="tabla-container">
+  <h2>Listado de Piletas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Largo</th>
+        <th>Ancho</th>
+        <th>Profundidad</th>
+        <th>Valor</th>
+        <th>Stock</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of piletasList; track $index) {
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.marca }}</td>
+          <td>{{ p.modelo }}</td>
+          <td>{{ p.largo }}</td>
+          <td>{{ p.ancho }}</td>
+          <td>{{ p.profundidad }}</td>
+          <td>{{ p.valor }}</td>
+          <td>{{ p.cantidad }}</td>
+          <td>
+            <button (click)="editarPileta(p.id!)">Editar</button>
+            @if(auth.esAdmin()){
+            <button (click)="eliminarPileta(p.id!)">Eliminar</button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
