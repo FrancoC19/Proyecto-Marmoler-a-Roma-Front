@@ -1,0 +1,73 @@
+.custom-navbar {
+  background-color: #5b0b0b !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Colores de texto */
+.navbar-brand,
+.nav-link {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.nav-link:hover,
+.navbar-brand:hover {
+  color: #f2c94c !important; 
+}
+
+/* Dropdown */
+.dropdown-menu {
+  background-color: #741414 !important;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-item {
+  color: #fff !important;
+}
+
+.dropdown-item:hover {
+  background-color: #8e1a1a !important;
+  color: #ffe08a !important;
+}
+
+/* Botón de usuario */
+.btn-outline-light {
+  border-color: #f2c94c !important;
+  color: #fff !important;
+}
+
+.btn-outline-light:hover {
+  background-color: #f2c94c !important;
+  color: #5b0b0b !important;
+  font-weight: 600;
+}
+
+/* Arreglar posición del dropdown de notificaciones */
+.dropdown-menu-end {
+  right: 0 !important;
+  left: auto !important;
+  transform: translateX(-30%) !important; /* desplazalo hacia adentro */
+  max-width: 350px;
+  white-space: normal;       /* Permite salto de línea */
+  word-wrap: break-word;     /* Rompe palabras largas */
+}
+
+/* 🔥 Dropdown de notificaciones más ancho */
+.dropdown-menu.notificaciones-menu {
+  max-width: none !important;   /* Elimina el límite */
+  width: auto !important;       /* Se adapta al contenido */
+  white-space: normal !important; /* Permite varias líneas si lo necesitás */
+  padding: 10px 15px;
+}
+
+.dropdown-notificaciones {
+  left: auto !important;
+  right: 0 !important;     /* Alineado al borde derecho del botón */
+  transform: none !important;
+  max-width: 350px;        /* Ajustale si querés más ancho */
+  white-space: normal;     /* Hace que el texto haga salto de línea */
+}
+
+

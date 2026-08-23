@@ -1,0 +1,39 @@
+<div class="contenedor-tabla">
+
+  <h2 class="titulo-tabla">Pedidos</h2>
+
+  <table class="tabla-pedidos">
+    <thead>
+      <tr>
+        <th>ID Pedido</th>
+        <th>Fecha Entrega</th>
+        <th>Empleado</th>
+        <th>Cliente</th>
+        <th>Material</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (p of pedidos; track p.idPedido) {
+      <tr>
+        <td>{{ p.idPedido }}</td>
+        <td>{{ p.fechaEntrega }}</td>
+        <td>{{ p.empleadoNombre }}</td>
+        <td>{{ p.clienteNombre }}</td>
+        <td>{{ p.materialNombre }}</td>
+
+        <!-- NUEVA COLUMNA -->
+        <td>
+          <span class="estado {{ p.estado }}">{{ mostrarEstado(p.estado) }}</span>
+        </td>
+
+        <td>
+          <button (click)="verDetalle(p.idPedido!)">Ver más</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

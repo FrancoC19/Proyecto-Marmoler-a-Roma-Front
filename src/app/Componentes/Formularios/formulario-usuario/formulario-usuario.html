@@ -1,0 +1,33 @@
+<div class="contenedor-usuario">
+  <div class="card-usuario">
+
+    <h2 class="titulo-usuario">Crear Usuario</h2>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="form-usuario">
+
+      <div>
+        <label>Email</label>
+        <input type="email" formControlName="email">
+      </div>
+
+      @if(!modoEdicion){
+      <div>
+        <label>Contraseña</label>
+        <input type="password" formControlName="contra">
+      </div>
+      }
+
+      <div>
+        <label>Tipo de Usuario</label>
+        <select formControlName="tipoUsuario">
+          <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+          <option value="USUARIO">USUARIO</option>
+        </select>
+      </div>
+
+      <button [disabled]="form.invalid">Guardar Usuario</button>
+
+    </form>
+
+  </div>
+</div>

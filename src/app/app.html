@@ -1,0 +1,15 @@
+@if(!isLoginRoute){
+  <header>
+    
+  </header>
+}
+
+<main [class.content]="!isLoginRoute" [class.login-background]="isLoginRoute">
+  <router-outlet></router-outlet>
+</main>
+
+@if(!isLoginRoute){
+  <footer>
+    <app-footer></app-footer>
+  </footer>
+}

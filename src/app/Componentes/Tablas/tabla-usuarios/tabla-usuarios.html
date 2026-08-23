@@ -1,0 +1,42 @@
+<div class="usuarios-container">
+
+  <h2>Usuarios</h2>
+
+  @if (cargando) {
+    <p>Cargando usuarios...</p>
+  } @else {
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (usuario of usuarios; track usuario.id) {
+          <tr>
+            <th data-label="ID">{{ usuario.id }}</th>
+            <th data-label="Correo">{{ usuario.email }}</th>
+            <th data-label="Rol">{{ usuario.tipoUsuario }}</th>
+
+            <th data-label="Acciones">
+              <button class="btn-accion" (click)="editar(usuario.id)">
+                Editar
+              </button>
+
+              <button class="btn-accion" (click)="eliminar(usuario.id)">
+                Eliminar
+              </button>
+            </th>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+  }
+</div>
+

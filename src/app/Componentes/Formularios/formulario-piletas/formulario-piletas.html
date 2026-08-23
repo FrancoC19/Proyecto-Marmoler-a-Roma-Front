@@ -1,0 +1,78 @@
+<form [formGroup]="form" (ngSubmit)="handleSubmit()">
+    <fieldset>
+        <legend>Piletas</legend>
+
+        <label for="marca">Marca: </label>
+        <input type="text" id="marca" placeholder="Ingrese la marca ..." formControlName="marca">
+        @if(getmarca().hasError('required')&&(getdirty()||gettouched())){
+            <span>La marca es requerida</span>
+        }
+
+        <label for="modelo">Modelo: </label>
+        <input type="text" id="modelo" placeholder="Ingrese el modelo.." formControlName="modelo">
+        @if(getmodelo().hasError('required')&&(getdirty()||gettouched())){
+            <span>El modelo es requerido</span>
+        }
+
+        <label for="largo">Largo: </label>
+        <input type="number" id="largo" placeholder="Ingrese el largo.." formControlName="largo">
+        @if(getdirty()||gettouched()){
+            @if(getlargo().hasError('required')){
+            <span>El largo es requerido</span>
+            }
+            @if(getlargo().hasError('min')){
+            <span>El valor tiene que ser mayor a 10Cm</span>
+            }@if(getlargo().hasError('max')){
+            <span>El valor no puede ser mayor a 100Cm</span>
+        }}
+
+        <label for="ancho">Ancho: </label>
+        <input type="number" id="ancho" placeholder="Ingrese el ancho.." formControlName="ancho">
+        @if(getdirty()||gettouched()){
+            @if(getancho().hasError('required')){
+            <span>El ancho es requerido</span>
+            }
+        @if(getancho().hasError('min')){
+            <span>El valor tiene que ser mayor a 5Cm</span>
+        }@if(getancho().hasError('max')){
+            <span>El valor no puede ser mayor a 100Cm</span>
+        }}
+
+        <label for="profundidad">Profundidad: </label>
+        <input type="number" id="profundidad" placeholder="Ingrese la profundidad.." formControlName="profundidad">
+        @if(getdirty()||gettouched()){
+            @if(getprofundidad().hasError('required')){
+                <span>La profundidad es requerido</span>
+            }
+            @if(getprofundidad().hasError('min')){
+            <span>El valor tiene que ser mayor a 3Cm</span>
+            }@if(getprofundidad().hasError('max')){
+            <span>El valor no puede ser mayor a 90Cm</span>
+        }}
+
+        <label for="valorP">Valor de la pileta: </label>
+        <input type="number" id="valorP" placeholder="Ingrese el valor.." formControlName="valor">
+        @if(getdirty()||gettouched()){
+            @if(getvalor().hasError('required')){
+            <span>El valor es requerido</span>
+            }
+        @if(getvalor().hasError('min')){
+            <span>El valor no puede ser negativo</span>
+        }}
+
+        <label for="stock">Stock: </label>
+        <input type="number" id="stock" placeholder="Ingrese el stock.." formControlName="cantidad">
+        @if(getdirty()||gettouched()){
+            @if(getcantidad().hasError('required')){
+            <span>El stock es requerido</span>
+            }
+        @if(getcantidad().hasError('min')){
+            <span>El stock no puede ser negativo</span>
+        }}
+
+        <button type="submit" [disabled]="form.invalid">Agregar</button>
+        <button type="reset">Eliminar</button>
+
+    </fieldset>
+</form>
+    

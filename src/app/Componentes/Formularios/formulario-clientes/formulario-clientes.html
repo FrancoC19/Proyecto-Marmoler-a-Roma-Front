@@ -1,0 +1,67 @@
+<form [formGroup]="form" (ngSubmit)="handleSubmit()" class="form">
+
+  <label>DNI</label>
+  <input type="number" formControlName="dni">
+  @if(getdni().hasError('required')&&(getdirty()||gettouched())){
+    <span>El dni es requrido</span>
+  }
+  @if((getdni().hasError('minlength') || getdni().hasError('maxlength')) && (getdirty() || gettouched())){
+  <span>El DNI debe tener exactamente 7 dígitos</span>
+  }
+
+  <label>Correo</label>
+  <input type="email" formControlName="correo">
+  @if(getdirty()||gettouched()){
+    @if(getcorreo().hasError('required')){
+      <span>El correo es requerido</span>
+    }
+    @if(getcorreo().hasError('email')){
+      <span>El correo deb tener formato email</span>
+    }
+  }
+
+  <label>Nombre</label>
+  <input type="text" formControlName="nombre">
+  @if(getnombre().hasError('required')&&(getdirty()||gettouched())){
+    <span>El nombre es requerido</span>
+  }
+
+  <label>Apellido</label>
+  <input type="text" formControlName="apellido">
+  @if(getapellido().hasError('required')&&(getdirty()||gettouched())){
+    <span>El Apellido es requerido</span>
+  }
+
+
+  <label>Teléfono</label>
+  <input type="text" formControlName="telefono">
+  @if(gettelefono().hasError('required')){
+    <span>El telefono es requerido</span>
+  }
+
+  <hr>
+
+  <h3>Direcciones</h3>
+
+  <button type="button" (click)="agregarDireccion()">Agregar Dirección</button>
+
+    @for (direccion of direcciones.controls; track $index) {
+    <div class="direccion-group" [formGroup]="direccion">
+
+      <label>Calle</label>
+      <input type="text" formControlName="calle">
+
+      <label>Número</label>
+      <input type="text" formControlName="numero">
+
+      <label>Localidad</label>
+      <input type="text" formControlName="localidad">
+
+      <button type="button" (click)="eliminarDireccion($index)">Eliminar</button>
+
+      <hr>
+    </div>
+  }
+
+  <button type="submit">Guardar</button>
+</form>
