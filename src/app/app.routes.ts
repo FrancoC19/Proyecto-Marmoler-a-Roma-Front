@@ -16,6 +16,7 @@ import { TablaPedidosEntregados } from './Componentes/Tablas/tabla-pedidos-entre
 import { DetailPedidosFinalizados } from './Componentes/Details/detail-pedidos/detail-pedidos-finalizados/detail-pedidos-finalizados';
 import { Dashboard } from './Componentes/dashboard/dashboard';
 import { AgregarImagen } from './Componentes/agregar-imagen/agregar-imagen';
+import { TablaPedidosAdmin } from './Componentes/Tablas/tabla-pedidos-admin/tabla-pedidos-admin';
 
 export const routes: Routes = [
     { path:'', redirectTo:'login', pathMatch:'full'},
@@ -41,5 +42,6 @@ export const routes: Routes = [
     {path:'FormularioPedidos/:id',component:FormularioPedidos},
     {path:'dashboard', component:Dashboard},
     {path:'AgregarImagen/:id',component:AgregarImagen},
+    {path:'TablaPedidosAdmin',component:TablaPedidosAdmin},
     { path: '**', redirectTo: 'login' }
 ];

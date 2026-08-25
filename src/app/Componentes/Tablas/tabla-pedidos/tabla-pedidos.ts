@@ -12,6 +12,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
 import { PedidoFull } from '../../../Models/PedidoFull';
+
 @Component({
   selector: 'app-tabla-pedidos',
   templateUrl: './tabla-pedidos.html',
@@ -59,9 +60,9 @@ export class TablaPedidos implements OnInit {
     next: res => this.empleados = res,
     error: err => console.error('Error cargando empleados', err)
   });
-}
+  }
 
-cargarClientes() {
+  cargarClientes() {
     this.clientesService.getAll().subscribe({
       next: res => this.clientes = res,
       error: err => console.error(err)
@@ -111,7 +112,7 @@ cargarClientes() {
 
   finalizarPedido(id: number) {
     this.pedidosService.finalizarPedido(id).subscribe({
-      next: () => console.log("Pedido finalizado"),
+      next: () => console.log("Estado finalizado"),
       error: err => console.error("Error finalizando:", err)
     });
   }
@@ -161,7 +162,7 @@ cargarClientes() {
     },
     error: err => console.error(err)
   });
-}
+  }
 
   filtrarPorCliente(dni: string) {
     const dniNum = Number(dni);
@@ -291,4 +292,5 @@ cargarClientes() {
     });
     
 
-}}
+  }
+}
