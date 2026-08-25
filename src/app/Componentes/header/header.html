@@ -94,15 +94,28 @@
   </button>
 
   <ul class="dropdown-menu dropdown-menu-end notificaciones-menu dropdown-notificaciones" [class.show]="mostrarDropdown">
-    @if (notificaciones.length === 0) {
+    @if (notificaciones.length === 0 && notificacionesAdmin.length ===0) {
       <li class="dropdown-item text-muted">
         Sin notificaciones
       </li>
     }
-    @for (n of notificaciones; track $index) {
-      <li class="dropdown-item">
-        {{ n.mensaje }}
-      </li>
+    @else {
+      @if (auth.esAdmin()) {
+        @if (notificacionesAdmin.length > 0) {
+          @for (n of notificacionesAdmin; track $index) {
+            <li class="dropdown-item">
+              {{ n.mensaje }}
+            </li>
+            }
+        }
+      }
+      @if (notificaciones.length > 0) {
+          @for (n of notificaciones; track $index) {
+            <li class="dropdown-item">
+              {{ n.mensaje }}
+            </li>
+          }
+      }
     }
   </ul>
 </div>
