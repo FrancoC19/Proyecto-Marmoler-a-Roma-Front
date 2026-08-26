@@ -12,6 +12,10 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
 import { PedidoFull } from '../../../Models/PedidoFull';
+import { ImagenService } from '../../../Services/ImagenService';
+import { Imagen } from '../../../Models/Imagen';
+import { firstValueFrom } from 'rxjs';
+
 
 @Component({
   selector: 'app-tabla-pedidos-admin',
@@ -19,6 +23,7 @@ import { PedidoFull } from '../../../Models/PedidoFull';
   styleUrl: './tabla-pedidos-admin.css',
 })
 export class TablaPedidosAdmin implements OnInit{
+  private imagenesPedido:Imagen[]=[]
 
   fechaInicio!: string;
   fechaFin!: string;
@@ -40,6 +45,7 @@ export class TablaPedidosAdmin implements OnInit{
     private clientesService: ClienteService,
     private empleadosService: EmpleadosService,
     private materialesService: MaterialesService,
+    private imagenService:ImagenService,
   ) {}
 
   ngOnInit() {
@@ -177,115 +183,192 @@ export class TablaPedidosAdmin implements OnInit{
       });
     }
   
-    crearPDF(id:number){
-      // Llama al servicio para obtener un pedido por su ID (petición asíncrona)
-      this.pedidosService.getById(id).subscribe({
-    
-        // Se ejecuta cuando la respuesta llega correctamente
-        next:(pedido:PedidoFull) => {
-    
-          // Objeto que define la estructura completa del PDF
-          const docDefinition: any = {
-    
-            // Contenido visible del PDF
-            content:[
-    
-              // Título principal con el número de pedido
-              {text: "Pedido N° " + pedido.id, style:"header"},
-    
-              // Fechas del pedido (se usan backticks para insertar variables)
-              { text: `Fecha Emisión: ${pedido.fechaEmision}`, margin: [0, 5, 0, 0] },
-    
-              // Sección cliente
-              { text: 'Cliente', style: 'subheader' },
-    
-              // Uso de columnas para mostrar nombre y DNI en la misma fila
-              { 
-                columns: [
-                  // Columna izquierda (tamaño automático)
-                  { width: 'auto', text: `Nombre: ${pedido.cliente?.nombre || ''} ${pedido.cliente?.apellido || ''}` },
-    
-                  // Columna derecha (ocupa el resto del espacio y alineada a la derecha)
-                  { width: '*', text: `DNI: ${pedido.cliente?.dni || ''}`, alignment: 'right' }
-                ],
-                margin: [0,5,0,5]
-              },
-    
-              // Sección empleado
-              { text: 'Empleado', style: 'subheader' },
-    
-              // Datos del empleado (con operador ? para evitar errores si es null)
-              { text: `${pedido.empleado?.nombre || ''} - DNI: ${pedido.empleado?.dni || ''}`, margin: [0,5,0,10] },
-    
-              // Sección detalles del pedido
-              { text: 'Detalles del Pedido', style: 'subheader' },
-    
-              // Tabla con información del pedido
-              {
-                table: {
-    
-                  // Dos columnas con mismo ancho
-                  widths: ['*','*'],
-    
-                  // Filas de la tabla (cada array es una fila)
-                  body: [
-                    ['Material', pedido.material?.nombreMaterial || ''],
-                    ['Marca Pileta', pedido.pileta?.marca || pedido.pileta || ''],
-                    ['Modelo Pileta', pedido.pileta?.modelo || pedido.pileta || ''],
-                    ['Ancho Pileta', pedido.pileta?.ancho || pedido.pileta || ''],
-                    ['Largo Pileta', pedido.pileta?.largo || pedido.pileta || ''],
-                    ['Profundidad Pileta', pedido.pileta?.profundidad || pedido.pileta || ''],
-                    ['Grifería', pedido.griferia || ''],
-                    ['Moldura', pedido.moldura || ''],
-                    ['Metros cuadrados', pedido.metrosCuadrados?.toString() || ''],
-                    ['Descuento', pedido.descuento?.toString() || ''],
-                    ['Seña', pedido.senia?.toString() || ''],
-                    ['Valor total', pedido.valorTotal?.toString() || ''],
-    
-                    // Dirección armada dinámicamente si existe
-                    ['Dirección', pedido.direccion 
-                      ? `${pedido.direccion.calle} ${pedido.direccion.numero || ''}, ${pedido.direccion.localidad || ''}` 
-                      : ''
-                    ]
-                  ]
-                },
-    
-                // Margen inferior y superior
-                margin: [0,5,0,10]
-              },
-              
-              // Sección observaciones
-              { text: 'Observaciones', style: 'subheader' },
-    
-              // Muestra observaciones o '-' si no hay
-              { text: pedido.observaciones || '-', margin: [0,5,0,20] },
-    
-              // Texto de firma
-              { text: 'Firma', margin: [0,40,0,0] },
-    
-              // Línea horizontal simulando espacio para firma
-              { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 300, y2: 0, lineWidth: 1 } ] }
-            ],
-    
-            // Estilos reutilizables
-            styles: {
-    
-              // Estilo para títulos principales
-              header: { fontSize: 18, bold: true, margin: [0,0,0,10] },
-    
-              // Estilo para subtítulos
-              subheader: { fontSize: 12, bold: true, margin: [0,10,0,5] }
-            },
-    
-            // Estilo por defecto para todo el documento
-            defaultStyle: { fontSize: 10 }
-          };
-    
-          // Genera el PDF y lo descarga con nombre dinámico
-          pdfMake.createPdf(docDefinition).download("Pedido: "+pedido.id)
-        }  
+async cargarImagenesPedido(id:number){
+    try {
+      this.imagenesPedido = await firstValueFrom(
+        this.imagenService.todasDePedido(id)
+      );
+    } catch (err) {
+      console.log("Error en la carga de las imagenes del pedido: ", err);
+      this.imagenesPedido = [];
+    }
+  }
+
+  async crearPDF(id:number){
+    await this.cargarImagenesPedido(id);
+
+    // Contenido que tendrá las imágenes del pedido organizadas de a dos por fila
+const contenidoImagen: any[] = [];
+
+// Recorremos todas las imágenes avanzando de a dos
+for (let i = 0; i < this.imagenesPedido.length; i += 2) {
+
+    // Creamos una fila que contendrá una o dos imágenes
+    const fila: any = {
+
+      // Las imágenes de la fila se colocan una al lado de la otra
+      columns: [
+
+        // Primera imagen de la fila
+        {
+          // Imagen en formato Base64
+          // Si ya contiene "data:image", se utiliza directamente.
+          // De lo contrario, se agrega el encabezado correspondiente a JPEG.
+          image: this.imagenesPedido[i].imagen.startsWith('data:image')
+            ? this.imagenesPedido[i].imagen
+            : `data:image/jpeg;base64,${this.imagenesPedido[i].imagen}`,
+
+          // Limita el tamaño de la imagen manteniendo sus proporciones
+          fit: [250, 180],
+
+          // Ancho máximo de la imagen
+          width: 250,
+
+          // Márgenes: arriba, derecha, abajo e izquierda
+          margin: [0, 10, 5, 10]
+        }
+      ]
+    };
+
+    // Verificamos si existe una segunda imagen para esta fila
+    if (this.imagenesPedido[i + 1]) {
+
+      // Agregamos la segunda imagen a la misma fila
+      fila.columns.push({
+
+        // Imagen en formato Base64
+        image: this.imagenesPedido[i + 1].imagen.startsWith('data:image')
+          ? this.imagenesPedido[i + 1].imagen
+          : `data:image/jpeg;base64,${this.imagenesPedido[i + 1].imagen}`,
+
+        // Limita el tamaño de la segunda imagen manteniendo sus proporciones
+        fit: [250, 180],
+
+        // Ancho máximo de la imagen
+        width: 250,
+
+        // Márgenes: arriba, derecha, abajo e izquierda
+        margin: [5, 10, 0, 10]
       });
-      
+    }
+
+    // Agregamos la fila completa al contenido del PDF
+    contenidoImagen.push(fila);
+  }
+    // Llama al servicio para obtener un pedido por su ID (petición asíncrona)
+    this.pedidosService.getById(id).subscribe({
   
+      // Se ejecuta cuando la respuesta llega correctamente
+      next:(pedido:PedidoFull) => {
+  
+        // Objeto que define la estructura completa del PDF
+        const docDefinition: any = {
+  
+          // Contenido visible del PDF
+          content:[
+  
+            // Título principal con el número de pedido
+            {text: "Pedido N° " + pedido.id, style:"header"},
+  
+            // Fechas del pedido (se usan backticks para insertar variables)
+            { text: `Fecha Emisión: ${pedido.fechaEmision}`, margin: [0, 5, 0, 0] },
+  
+            // Sección cliente
+            { text: 'Cliente', style: 'subheader' },
+  
+            // Uso de columnas para mostrar nombre y DNI en la misma fila
+            { 
+              columns: [
+                // Columna izquierda (tamaño automático)
+                { width: 'auto', text: `Nombre: ${pedido.cliente?.nombre || ''} ${pedido.cliente?.apellido || ''}` },
+  
+                // Columna derecha (ocupa el resto del espacio y alineada a la derecha)
+                { width: '*', text: `DNI: ${pedido.cliente?.dni || ''}`, alignment: 'right' }
+              ],
+              margin: [0,5,0,5]
+            },
+  
+            // Sección empleado
+            { text: 'Empleado', style: 'subheader' },
+  
+            // Datos del empleado (con operador ? para evitar errores si es null)
+            { text: `${pedido.empleado?.nombre || ''} - DNI: ${pedido.empleado?.dni || ''}`, margin: [0,5,0,10] },
+  
+            // Sección detalles del pedido
+            { text: 'Detalles del Pedido', style: 'subheader' },
+  
+            // Tabla con información del pedido
+            {
+              table: {
+  
+                // Dos columnas con mismo ancho
+                widths: ['*','*'],
+  
+                // Filas de la tabla (cada array es una fila)
+                body: [
+                  ['Material', pedido.material?.nombreMaterial || ''],
+                  ['Marca Pileta', pedido.pileta?.marca || pedido.pileta || ''],
+                  ['Modelo Pileta', pedido.pileta?.modelo || pedido.pileta || ''],
+                  ['Ancho Pileta', pedido.pileta?.ancho || pedido.pileta || ''],
+                  ['Largo Pileta', pedido.pileta?.largo || pedido.pileta || ''],
+                  ['Profundidad Pileta', pedido.pileta?.profundidad || pedido.pileta || ''],
+                  ['Grifería', pedido.griferia || ''],
+                  ['Moldura', pedido.moldura || ''],
+                  ['Metros cuadrados', pedido.metrosCuadrados?.toString() || ''],
+                  ['Descuento', pedido.descuento?.toString() || ''],
+                  ['Seña', pedido.senia?.toString() || ''],
+                  ['Valor total', pedido.valorTotal?.toString() || ''],
+  
+                  // Dirección armada dinámicamente si existe
+                  ['Dirección', pedido.direccion 
+                    ? `${pedido.direccion.calle} ${pedido.direccion.numero || ''}, ${pedido.direccion.localidad || ''}` 
+                    : ''
+                  ]
+                ]
+              },
+  
+              // Margen inferior y superior
+              margin: [0,5,0,10]
+            },
+            
+            // Sección observaciones
+            { text: 'Observaciones', style: 'subheader' },
+  
+            // Muestra observaciones o '-' si no hay
+            { text: pedido.observaciones || '-', margin: [0,5,0,20] },
+  
+            // Subtitulo de planos
+            {text: 'Diagrama|Plano',style:'subheader'},
+
+            //Imagen del plano
+            ...contenidoImagen,
+
+            // Texto de firma
+            { text: 'Firma', margin: [0,40,0,0] },
+  
+            // Línea horizontal simulando espacio para firma
+            { canvas: [ { type: 'line', x1: 0, y1: 0, x2: 300, y2: 0, lineWidth: 1 } ] }
+          ],
+  
+          // Estilos reutilizables
+          styles: {
+  
+            // Estilo para títulos principales
+            header: { fontSize: 18, bold: true, margin: [0,0,0,10] },
+  
+            // Estilo para subtítulos
+            subheader: { fontSize: 12, bold: true, margin: [0,10,0,5] }
+          },
+  
+          // Estilo por defecto para todo el documento
+          defaultStyle: { fontSize: 10 }
+        };
+  
+        // Genera el PDF y lo descarga con nombre dinámico
+        pdfMake.createPdf(docDefinition).download("Pedido: "+pedido.id)
+      }  
+    });
+    
+
   }
 }

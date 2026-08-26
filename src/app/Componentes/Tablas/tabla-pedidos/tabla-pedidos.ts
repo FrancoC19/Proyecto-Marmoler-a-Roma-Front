@@ -4,14 +4,17 @@ import { PedidosService } from '../../../Services/pedidosService';
 import { ClienteService } from '../../../Services/ClienteService';
 import { EmpleadosService } from '../../../Services/EmpleadosService';
 import { MaterialesService } from '../../../Services/MaterialesService';
+import { ImagenService } from '../../../Services/ImagenService';
 import { pedidosTabla } from '../../../Models/PedidosTabla';
 import { empleado } from '../../../Models/Empleado';
 import { cliente } from '../../../Models/Cliente';
 import { material } from '../../../Models/Materiales';
+import { Imagen } from '../../../Models/Imagen';
 import pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
 import { PedidoFull } from '../../../Models/PedidoFull';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tabla-pedidos',
@@ -19,6 +22,7 @@ import { PedidoFull } from '../../../Models/PedidoFull';
   styleUrls: ['./tabla-pedidos.css']
 })
 export class TablaPedidos implements OnInit {
+  private imagenesPedido:Imagen[]=[]
 
   fechaInicio!: string;
   fechaFin!: string;
@@ -40,6 +44,7 @@ export class TablaPedidos implements OnInit {
     private clientesService: ClienteService,
     private empleadosService: EmpleadosService,
     private materialesService: MaterialesService,
+    private imagenService:ImagenService,
     private router: Router
   ) {}
 
@@ -182,7 +187,78 @@ export class TablaPedidos implements OnInit {
     });
   }
 
-  crearPDF(id:number){
+  async cargarImagenesPedido(id:number){
+    try {
+      this.imagenesPedido = await firstValueFrom(
+        this.imagenService.todasDePedido(id)
+      );
+    } catch (err) {
+      console.log("Error en la carga de las imagenes del pedido: ", err);
+      this.imagenesPedido = [];
+    }
+  }
+
+  async crearPDF(id:number){
+    await this.cargarImagenesPedido(id);
+
+    // Contenido que tendrá las imágenes del pedido organizadas de a dos por fila
+const contenidoImagen: any[] = [];
+
+// Recorremos todas las imágenes avanzando de a dos
+for (let i = 0; i < this.imagenesPedido.length; i += 2) {
+
+    // Creamos una fila que contendrá una o dos imágenes
+    const fila: any = {
+
+      // Las imágenes de la fila se colocan una al lado de la otra
+      columns: [
+
+        // Primera imagen de la fila
+        {
+          // Imagen en formato Base64
+          // Si ya contiene "data:image", se utiliza directamente.
+          // De lo contrario, se agrega el encabezado correspondiente a JPEG.
+          image: this.imagenesPedido[i].imagen.startsWith('data:image')
+            ? this.imagenesPedido[i].imagen
+            : `data:image/jpeg;base64,${this.imagenesPedido[i].imagen}`,
+
+          // Limita el tamaño de la imagen manteniendo sus proporciones
+          fit: [250, 180],
+
+          // Ancho máximo de la imagen
+          width: 250,
+
+          // Márgenes: arriba, derecha, abajo e izquierda
+          margin: [0, 10, 5, 10]
+        }
+      ]
+    };
+
+    // Verificamos si existe una segunda imagen para esta fila
+    if (this.imagenesPedido[i + 1]) {
+
+      // Agregamos la segunda imagen a la misma fila
+      fila.columns.push({
+
+        // Imagen en formato Base64
+        image: this.imagenesPedido[i + 1].imagen.startsWith('data:image')
+          ? this.imagenesPedido[i + 1].imagen
+          : `data:image/jpeg;base64,${this.imagenesPedido[i + 1].imagen}`,
+
+        // Limita el tamaño de la segunda imagen manteniendo sus proporciones
+        fit: [250, 180],
+
+        // Ancho máximo de la imagen
+        width: 250,
+
+        // Márgenes: arriba, derecha, abajo e izquierda
+        margin: [5, 10, 0, 10]
+      });
+    }
+
+    // Agregamos la fila completa al contenido del PDF
+    contenidoImagen.push(fila);
+  }
     // Llama al servicio para obtener un pedido por su ID (petición asíncrona)
     this.pedidosService.getById(id).subscribe({
   
@@ -265,6 +341,12 @@ export class TablaPedidos implements OnInit {
             // Muestra observaciones o '-' si no hay
             { text: pedido.observaciones || '-', margin: [0,5,0,20] },
   
+            // Subtitulo de planos
+            {text: 'Diagrama|Plano',style:'subheader'},
+
+            //Imagen del plano
+            ...contenidoImagen,
+
             // Texto de firma
             { text: 'Firma', margin: [0,40,0,0] },
   
