@@ -1,0 +1,32 @@
+<div class="contenedor-carga">
+    <label for="inputImagen" class="zona-carga"
+    (dragover)="$event.preventDefault()" (drop)="soltarImagen($event)">
+        <p>Arrastra la imagen aqui</p>
+        
+        <p>o hace click para seleccionar el archivo</p>
+        <input
+        id="inputImagen" 
+        type="file"
+        accept="image/*"
+        (change)="seleccionaImagen($event)"
+        hidden>
+    </label>
+    <button type="button" (click)="guardarImagen()"[disabled]="!imagenSeleccionada">
+        Agregar imagen
+    </button>
+</div>
+<div class="imagenes-pedido">
+    @if (todasImagenes.length>0) {
+        @for (img of todasImagenes; track $index) {
+            <div class="imagen">
+                <img [src]="'data:image/png;base64,' + img.imagen" alt="Imagen del Pedido">
+                <button type="button" (click)="eliminarImagen(img.numeroDeImagenDelPedido)">
+                    Eliminar
+                </button>
+            </div>
+        }
+    }
+    @else {
+        <p class="sin-imagen">Este pedido no tiene ninguna imagen relacionada</p>
+    }
+</div>

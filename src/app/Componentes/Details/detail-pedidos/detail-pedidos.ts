@@ -14,8 +14,7 @@ import { AuthService } from '../../../Services/auth-service';
   styleUrl: './detail-pedidos.css',
 })
 export class DetailPedidos {
-
-   pedido!: any;
+  pedido!: any;
 
   // 🔥 Usando inject() en lugar del constructor
   private route = inject(ActivatedRoute);
@@ -66,6 +65,11 @@ export class DetailPedidos {
   // 🚀 Navega al formulario en modo edición
   editarPedido() {
     this.router.navigate([`/FormularioPedidos`, this.pedido.idPedido]);
+  }
+
+  //Redireccion a para agregar una imagen
+  agregarImagen(){
+    this.router.navigate([`/AgregarImagen`,this.pedido.idPedido])
   }
 
   // ❌ Eliminar pedido con confirmación

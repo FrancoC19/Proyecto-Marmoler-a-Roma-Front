@@ -1,0 +1,114 @@
+<div class="panel-busquedas">
+
+  <!-- FILA 1 -->
+  <div class="item-busqueda">
+    <label>Estado:</label>
+    <select #estadoSelect (change)="filtrarPorEstado(estadoSelect.value)">
+      <option value="">-- Todos --</option>
+      <option value="EN_PROCESO">En proceso</option>
+      <option value="PENDIENTE_DE_ENTREGA">Pendiente de entrega</option>
+      <option value="ENTREGADO">Entregado</option>
+    </select>
+  </div>
+
+  <div class="item-busqueda">
+    <label>Fecha Inicio:</label>
+    <input type="date" #fechaInicio>
+  </div>
+
+  <div class="item-busqueda">
+    <label>Fecha Fin:</label>
+    <input type="date" #fechaFin>
+  </div>
+
+  <div class="item-busqueda btn-buscar">
+    <button (click)="filtrarPorFechas(fechaInicio.value, fechaFin.value)">
+      Buscar
+    </button>
+  </div>
+
+  <!-- FILA 2 -->
+  <div class="item-busqueda">
+  <label>Empleado:</label>
+  <select #empleadoSelect (change)="filtrarPorEmpleado(empleadoSelect.value)">
+    <option value="">-- Todos --</option>
+    @for (e of empleados; track e.dni) {
+      <option value="{{ e.dni }}">
+        {{ e.nombre }} {{ e.rolesEmpleado }}
+      </option>
+    }
+  </select>
+</div>
+
+
+  <div class="item-busqueda">
+  <label>Cliente:</label>
+  <select #clienteSelect (change)="filtrarPorCliente(clienteSelect.value)">
+    <option value="">-- Todos --</option>
+    @for (c of clientes; track c.dni) {
+      <option value="{{ c.dni }}">
+        {{ c.nombre }} {{ c.apellido }}
+      </option>
+    }
+  </select>
+  </div>
+
+  <div class="item-busqueda">
+    <label>Material:</label>
+    <select #materialSelect (change)="filtrarPorMaterial(materialSelect.value)">
+      <option value="">-- Todos --</option>
+      @for (m of materiales; track m.id) {
+        <option value="{{ m.id }}">
+          {{ m.nombreMaterial }}
+        </option>
+      }
+    </select>
+  </div>
+
+  <div class="item-busqueda btn-limpiar-container">
+    <button class="btn-limpiar" (click)="cargarPedidos()">Limpiar filtros</button>
+  </div>
+
+</div>
+
+
+<div class="contenedor-tabla">
+
+  <h2 class="titulo-tabla">Pedidos a confirmar Entrega</h2>
+
+  <table class="tabla-pedidos">
+    <thead>
+      <tr>
+        <th>ID Pedido</th>
+        <th>Fecha Entrega</th>
+        <th>Empleado</th>
+        <th>Cliente</th>
+        <th>Material</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (p of pedidos; track p.idPedido) {
+      <tr>
+        <td>{{ p.idPedido }}</td>
+        <td>{{ p.fechaEntrega }}</td>
+        <td>{{ p.empleadoNombre }}</td>
+        <td>{{ p.clienteNombre }}</td>
+        <td>{{ p.materialNombre }}</td>
+
+        <!-- NUEVA COLUMNA -->
+        <td>
+          <span class="estado {{ p.estado }}">{{ mostrarEstado(p.estado) }}</span>
+        </td>
+
+        <td>
+          <button (click)="finalizarPedido(p.idPedido!)">Finalizar</button>
+          <button (click)="crearPDF(p.idPedido!)">Descargar</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

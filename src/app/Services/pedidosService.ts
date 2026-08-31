@@ -76,8 +76,16 @@ export class PedidosService {
   return this.http.put(`${this.apiUrl}/Finalizar/${id}`,{responseType: 'text'});
   }
 
+  entregarPedido(id:number) {
+  return this.http.put(`${this.apiUrl}/EntregarPedido/${id}`,{responseType: 'text'});
+  }
+
   getPendientesATerminar() {
     return this.http.get<pedidos[]>(`${this.apiUrl}/PendientesAterminar`);
+  }
+
+  getEnProceso(){
+    return this.http.get<pedidos[]>(`${this.apiUrl}/EnProceso`);
   }
   
   getPedidosTerminados(){

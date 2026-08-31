@@ -4,24 +4,25 @@ import { PedidosService } from '../../../Services/pedidosService';
 import { ClienteService } from '../../../Services/ClienteService';
 import { EmpleadosService } from '../../../Services/EmpleadosService';
 import { MaterialesService } from '../../../Services/MaterialesService';
-import { ImagenService } from '../../../Services/ImagenService';
 import { pedidosTabla } from '../../../Models/PedidosTabla';
 import { empleado } from '../../../Models/Empleado';
 import { cliente } from '../../../Models/Cliente';
 import { material } from '../../../Models/Materiales';
-import { Imagen } from '../../../Models/Imagen';
 import pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 (pdfMake as any).vfs = (pdfFonts as any).vfs;
 import { PedidoFull } from '../../../Models/PedidoFull';
+import { ImagenService } from '../../../Services/ImagenService';
+import { Imagen } from '../../../Models/Imagen';
 import { firstValueFrom } from 'rxjs';
-@Component({
-  selector: 'app-tabla-pedidos',
-  templateUrl: './tabla-pedidos.html',
-  styleUrls: ['./tabla-pedidos.css']
-})
-export class TablaPedidos implements OnInit {
 
+
+@Component({
+  selector: 'app-tabla-pedidos-admin',
+  templateUrl: './tabla-pedidos-admin.html',
+  styleUrl: './tabla-pedidos-admin.css',
+})
+export class TablaPedidosAdmin implements OnInit{
   private imagenesPedido:Imagen[]=[]
 
   fechaInicio!: string;
@@ -45,7 +46,6 @@ export class TablaPedidos implements OnInit {
     private empleadosService: EmpleadosService,
     private materialesService: MaterialesService,
     private imagenService:ImagenService,
-    private router: Router
   ) {}
 
   ngOnInit() {
@@ -106,7 +106,7 @@ export class TablaPedidos implements OnInit {
   }
 
   cargarPedidos() {
-    this.pedidosService.getPendientesATerminar().subscribe({
+    this.pedidosService.getEnProceso().subscribe({
       next: pedidosRecibidos => {
         this.pedidos = pedidosRecibidos as pedidosTabla[];
         this.completarDatosPedidos(this.pedidos);
@@ -116,78 +116,74 @@ export class TablaPedidos implements OnInit {
   }
 
   finalizarPedido(id: number) {
-    this.pedidosService.finalizarPedido(id).subscribe({
+    this.pedidosService.entregarPedido(id).subscribe({
       next: () => console.log("Estado finalizado"),
       error: err => console.error("Error finalizando:", err)
     });
   }
 
-  verDetalle(id: number) {
-    this.router.navigateByUrl(`DetallesPedidos/${id}`);
-  }
-
   filtrarPorEstado(estadoString: string) {
-    if (!estadoString) {
-      this.cargarPedidos();
-      return;
+      if (!estadoString) {
+        this.cargarPedidos();
+        return;
+      }
+  
+      this.pedidosService.getByEstado(estadoString).subscribe({
+        next: res => {
+          this.pedidos = res as pedidosTabla[];
+          this.completarDatosPedidos(this.pedidos);
+        },
+        error: err => console.error(err)
+      });
     }
-
-    this.pedidosService.getByEstado(estadoString).subscribe({
-      next: res => {
-        this.pedidos = res as pedidosTabla[];
-        this.completarDatosPedidos(this.pedidos);
-      },
-      error: err => console.error(err)
-    });
-  }
-
-  filtrarPorFechas(inicio: string, fin: string) {
-    if (!inicio || !fin) return;
-
-    this.pedidosService.obtenerPorRangoDeFecha(
-      new Date(inicio),
-      new Date(fin)
-    ).subscribe({
-      next: res => {
-        this.pedidos = res as pedidosTabla[];
-        this.completarDatosPedidos(this.pedidos);
-      },
-      error: err => console.error(err)
-    });
-  }
-
-  filtrarPorEmpleado(dni: string) {
-  const dniNum = Number(dni);
-  if (!dniNum) return;
-
-  this.pedidosService.getByEmpleado(dniNum).subscribe({
-    next: res => {
-      this.pedidos = res as pedidosTabla[];
-      this.completarDatosPedidos(this.pedidos);
-    },
-    error: err => console.error(err)
-  });
-  }
-
-  filtrarPorCliente(dni: string) {
+  
+    filtrarPorFechas(inicio: string, fin: string) {
+      if (!inicio || !fin) return;
+  
+      this.pedidosService.obtenerPorRangoDeFecha(
+        new Date(inicio),
+        new Date(fin)
+      ).subscribe({
+        next: res => {
+          this.pedidos = res as pedidosTabla[];
+          this.completarDatosPedidos(this.pedidos);
+        },
+        error: err => console.error(err)
+      });
+    }
+  
+    filtrarPorEmpleado(dni: string) {
     const dniNum = Number(dni);
     if (!dniNum) return;
-    this.pedidosService.getByCliente(dniNum).subscribe({
-      next: res => { this.pedidos = res as pedidosTabla[]; this.completarDatosPedidos(this.pedidos); },
+  
+    this.pedidosService.getByEmpleado(dniNum).subscribe({
+      next: res => {
+        this.pedidos = res as pedidosTabla[];
+        this.completarDatosPedidos(this.pedidos);
+      },
       error: err => console.error(err)
     });
-  }
-
-  filtrarPorMaterial(id: string) {
-    const idNum = Number(id);
-    if (!idNum) return;
-    this.pedidosService.getByMaterial(idNum).subscribe({
-      next: res => { this.pedidos = res as pedidosTabla[]; this.completarDatosPedidos(this.pedidos); },
-      error: err => console.error(err)
-    });
-  }
-
-  async cargarImagenesPedido(id:number){
+    }
+  
+    filtrarPorCliente(dni: string) {
+      const dniNum = Number(dni);
+      if (!dniNum) return;
+      this.pedidosService.getByCliente(dniNum).subscribe({
+        next: res => { this.pedidos = res as pedidosTabla[]; this.completarDatosPedidos(this.pedidos); },
+        error: err => console.error(err)
+      });
+    }
+  
+    filtrarPorMaterial(id: string) {
+      const idNum = Number(id);
+      if (!idNum) return;
+      this.pedidosService.getByMaterial(idNum).subscribe({
+        next: res => { this.pedidos = res as pedidosTabla[]; this.completarDatosPedidos(this.pedidos); },
+        error: err => console.error(err)
+      });
+    }
+  
+async cargarImagenesPedido(id:number){
     try {
       this.imagenesPedido = await firstValueFrom(
         this.imagenService.todasDePedido(id)
@@ -373,5 +369,6 @@ for (let i = 0; i < this.imagenesPedido.length; i += 2) {
       }  
     });
     
+
   }
 }
